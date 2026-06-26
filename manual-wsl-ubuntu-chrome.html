@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manual Profissional - Instalação do WSL com Ubuntu e Google Chrome</title>
+  <style>
+    :root {
+      --bg: #f3f6fb;
+      --text: #1b2430;
+      --muted: #546173;
+      --primary: #0b57d0;
+      --primary-dark: #083b8a;
+      --accent: #ffb300;
+      --border: #d8e0ec;
+      --panel: #ffffff;
+      --success: #1b7f3b;
+      --warning: #9a6700;
+      --danger: #b42318;
+      --shadow: 0 8px 24px rgba(11, 32, 64, 0.08);
+      --font-sans: "Segoe UI", Arial, Helvetica, sans-serif;
+      --font-mono: "Cascadia Code", "Consolas", "Courier New", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-sans);
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.55;
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 14mm auto;
+      padding: 18mm 16mm 18mm 16mm;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      page-break-after: always;
+      break-after: page;
+      position: relative;
+    }
+
+    .page:last-child {
+      page-break-after: auto;
+      break-after: auto;
+    }
+
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background:
+        linear-gradient(145deg, rgba(11, 87, 208, 0.08), rgba(255, 179, 0, 0.08)),
+        linear-gradient(180deg, #ffffff, #f8fbff);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .cover::before,
+    .cover::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.18;
+      z-index: 0;
+    }
+
+    .cover::before {
+      width: 120mm;
+      height: 120mm;
+      right: -40mm;
+      top: -35mm;
+      background: radial-gradient(circle, var(--primary), transparent 70%);
+    }
+
+    .cover::after {
+      width: 110mm;
+      height: 110mm;
+      left: -35mm;
+      bottom: -45mm;
+      background: radial-gradient(circle, var(--accent), transparent 70%);
+    }
+
+    .cover > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(11, 87, 208, 0.1);
+      color: var(--primary-dark);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-size: 11px;
+    }
+
+    h1, h2, h3, h4 {
+      color: #10223b;
+      margin-top: 0;
+    }
+
+    h1 {
+      font-size: 30px;
+      line-height: 1.15;
+      margin: 10mm 0 6mm;
+    }
+
+    h2 {
+      font-size: 22px;
+      margin: 0 0 6mm;
+      padding-bottom: 2mm;
+      border-bottom: 2px solid #dbe7fb;
+    }
+
+    h3 {
+      font-size: 17px;
+      margin: 7mm 0 3mm;
+    }
+
+    h4 {
+      font-size: 14px;
+      margin: 5mm 0 2mm;
+    }
+
+    p, li { font-size: 13.2px; }
+
+    .lead {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 145mm;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 10mm;
+    }
+
+    .meta-card,
+    .callout,
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .meta-card {
+      padding: 12px 14px;
+    }
+
+    .meta-card strong {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+      letter-spacing: 0.04em;
+    }
+
+    .cover-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 20px;
+      padding-top: 16mm;
+      border-top: 1px solid rgba(16, 34, 59, 0.12);
+    }
+
+    .toc-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      counter-reset: item;
+    }
+
+    .toc-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 7px 0;
+      border-bottom: 1px dashed #ccd6e5;
+      font-size: 13px;
+    }
+
+    .toc-list a {
+      color: var(--primary-dark);
+      text-decoration: none;
+      flex: 1;
+    }
+
+    .toc-level-3 {
+      padding-left: 12px;
+      font-size: 12.5px;
+    }
+
+    .section-intro {
+      color: var(--muted);
+      margin-bottom: 4mm;
+    }
+
+    .callout,
+    .panel {
+      padding: 12px 14px;
+      margin: 5mm 0;
+    }
+
+    .callout strong {
+      color: #0f2f66;
+    }
+
+    .callout.info { border-left: 5px solid var(--primary); }
+    .callout.warning { border-left: 5px solid var(--warning); background: #fff9ed; }
+    .callout.success { border-left: 5px solid var(--success); background: #f2fbf5; }
+    .callout.danger { border-left: 5px solid var(--danger); background: #fff5f5; }
+
+    .steps {
+      counter-reset: step;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .steps li {
+      counter-increment: step;
+      margin: 0 0 10px;
+      padding: 12px 12px 12px 46px;
+      position: relative;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fbfdff;
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 12px;
+      top: 11px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, var(--primary), #3a84ff);
+    }
+
+    .command {
+      margin: 10px 0;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #d9e2f1;
+      background: #0f172a;
+      color: #e5eefc;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .command .label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: #16233d;
+      color: #9ec1ff;
+      padding: 6px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-weight: 700;
+    }
+
+    .command pre {
+      margin: 0;
+      padding: 11px 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.55;
+    }
+
+    .grid-2,
+    .grid-3 {
+      display: grid;
+      gap: 12px;
+    }
+
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 5mm 0;
+      font-size: 12.5px;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 9px 10px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #edf4ff;
+      color: #183153;
+      text-align: left;
+    }
+
+    .small { font-size: 11.6px; color: var(--muted); }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .checklist li {
+      display: flex;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px dashed #d3ddea;
+      font-size: 13px;
+    }
+
+    .checkbox {
+      width: 16px;
+      height: 16px;
+      border: 2px solid #6a7b90;
+      border-radius: 4px;
+      flex: 0 0 16px;
+      margin-top: 2px;
+    }
+
+    .flowchart {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: linear-gradient(180deg, #fbfdff, #f4f8ff);
+      padding: 10px;
+      margin: 5mm 0;
+    }
+
+    .page-break {
+      page-break-before: always;
+      break-before: page;
+    }
+
+    .footer-note {
+      position: absolute;
+      bottom: 10mm;
+      right: 16mm;
+      font-size: 10.2px;
+      color: #6b7788;
+    }
+
+    code.inline {
+      font-family: var(--font-mono);
+      background: #eef3fa;
+      border: 1px solid #d7e1f0;
+      padding: 1px 5px;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+
+    ul.compact li,
+    ol.compact li { margin-bottom: 4px; }
+
+    @media print {
+      @page {
+        size: A4;
+        margin: 12mm;
+      }
+
+      html, body {
+        background: #fff;
+      }
+
+      body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .page {
+        width: auto;
+        min-height: auto;
+        margin: 0;
+        padding: 14mm 12mm;
+        box-shadow: none;
+        border: none;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+    }
+
+    @media screen and (max-width: 900px) {
+      .page {
+        width: auto;
+        min-height: auto;
+        margin: 0;
+        border-radius: 0;
+      }
+
+      .grid-2, .grid-3, .meta-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="page cover">
+    <div>
+      <span class="eyebrow">Manual profissional</span>
+      <h1>Instalação do WSL no Windows<br />com Ubuntu e Google Chrome</h1>
+      <p class="lead">
+        Guia detalhado para instalar, validar, ajustar desempenho, configurar ferramentas e resolver erros comuns no Windows Subsystem for Linux (WSL), com foco em Ubuntu e uso do Google Chrome dentro do ambiente Linux.
+      </p>
+      <div class="meta-grid">
+        <div class="meta-card">
+          <strong>Público-alvo</strong>
+          Profissionais, estudantes e praticantes de Engenharia de IA que precisam de um ambiente Windows + Linux moderno, reproduzível e pronto para desenvolvimento.
+        </div>
+        <div class="meta-card">
+          <strong>Escopo</strong>
+          Windows 10/11, WSL 2, Ubuntu, WSLg, integração com PowerShell, VS Code, Python, Git e Chrome no Linux.
+        </div>
+        <div class="meta-card">
+          <strong>Formato</strong>
+          Documento HTML com CSS otimizado para papel A4, índice automático, fluxogramas em SVG, tabelas de troubleshooting e checklist de validação.
+        </div>
+        <div class="meta-card">
+          <strong>Saída final</strong>
+          Estrutura pronta para abrir no navegador, revisar e salvar diretamente como PDF usando a opção “Imprimir”.
+        </div>
+      </div>
+    </div>
+    <div class="cover-footer">
+      <div>
+        <strong>Autor do manual</strong>
+        <p class="small">Assistente técnico para instalação guiada e boas práticas de Engenharia de IA.</p>
+      </div>
+      <div>
+        <strong>Data de emissão</strong>
+        <p class="small" id="issue-date">26/06/2026</p>
+      </div>
+    </div>
+    <div class="footer-note">Versão 1.0 · Documento autocontido</div>
+  </section>
+
+  <section class="page">
+    <h2>Índice</h2>
+    <p class="section-intro">O índice abaixo é montado automaticamente a partir dos capítulos e subcapítulos do documento.</p>
+    <ol class="toc-list" id="toc"></ol>
+
+    <div class="callout info">
+      <strong>Como gerar o PDF:</strong> abra este arquivo no Google Chrome ou Microsoft Edge, use <code class="inline">Ctrl + P</code>, selecione “Salvar como PDF”, mantenha o tamanho do papel em <code class="inline">A4</code> e ative gráficos de fundo para preservar a identidade visual.
+    </div>
+
+    <div class="callout warning">
+      <strong>Detalhe fundamental incluído:</strong> antes de alterar recursos do WSL ou ativar virtualização, confirme se existe espaço livre em disco, se o Windows está atualizado e se há backup ou ponto de restauração. Isso não foi pedido explicitamente, mas reduz bastante o risco de falhas e retrabalho.
+    </div>
+  </section>
+
+  <section class="page page-break">
+    <h2 id="cap-1">1. Visão geral e pré-requisitos</h2>
+    <p class="section-intro">Antes de instalar qualquer componente, confirme compatibilidade, direitos administrativos e dependências do Windows.</p>
+
+    <div class="grid-2">
+      <div class="panel">
+        <h3>1.1 Requisitos mínimos</h3>
+        <ul class="compact">
+          <li>Windows 11 ou Windows 10 versão 2004+ com build 19041 ou superior.</li>
+          <li>Permissão de administrador local para ativar recursos do Windows.</li>
+          <li>Conexão com internet estável para baixar WSL, Ubuntu e Google Chrome.</li>
+          <li>Pelo menos 15 GB livres em disco; 30 GB é mais confortável para desenvolvimento.</li>
+          <li>Virtualização habilitada na BIOS/UEFI: Intel VT-x ou AMD-V.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>1.2 O que será instalado</h3>
+        <ul class="compact">
+          <li>Subsistema Windows para Linux (WSL).</li>
+          <li>Motor de virtualização do WSL 2.</li>
+          <li>Distribuição Ubuntu.</li>
+          <li>Google Chrome para Linux dentro do Ubuntu.</li>
+          <li>Base recomendada para IA: Python, pip, venv, Git e VS Code.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout success">
+      <strong>Reavaliação do cenário:</strong> para Engenharia de IA, usar <code class="inline">WSL 2</code> é essencial. O WSL 1 é mais simples, mas perde compatibilidade com várias bibliotecas Linux, containers e fluxos modernos de desenvolvimento.
+    </div>
+
+    <h3>1.3 Verificações iniciais no Windows</h3>
+    <ol class="steps">
+      <li>Abra o menu Iniciar, pesquise por <strong>PowerShell</strong>, clique com o botão direito e selecione <strong>Executar como administrador</strong>.</li>
+      <li>Confirme a versão do Windows executando o comando abaixo. Compare o número da build com o requisito mínimo.</li>
+      <li>Verifique se a virtualização está ativa pelo Gerenciador de Tarefas em <strong>Desempenho &gt; CPU &gt; Virtualização</strong>.</li>
+      <li>Confirme se você tem espaço livre em disco em <strong>Configurações &gt; Sistema &gt; Armazenamento</strong>.</li>
+      <li>Se o computador for corporativo, confirme se políticas de segurança não bloqueiam recursos opcionais, Microsoft Store ou instalação de software.</li>
+    </ol>
+
+    <div class="command">
+      <span class="label">PowerShell (Administrador)</span>
+      <pre>winver
+systeminfo | findstr /B /C:"OS Name" /C:"OS Version"</pre>
+    </div>
+
+    <div class="flowchart">
+      <svg viewBox="0 0 860 340" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Fluxograma de pré-requisitos do WSL">
+        <defs>
+          <marker id="arrow-a" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+            <path d="M0,0 L10,3 L0,6 Z" fill="#285ea8"></path>
+          </marker>
+        </defs>
+        <rect x="20" y="30" width="180" height="70" rx="18" fill="#0b57d0" opacity="0.92" />
+        <text x="110" y="60" text-anchor="middle" font-family="Segoe UI" font-size="18" fill="#fff" font-weight="700">Início</text>
+        <text x="110" y="84" text-anchor="middle" font-family="Segoe UI" font-size="13" fill="#e8f0ff">Validar Windows</text>
+
+        <rect x="260" y="30" width="220" height="70" rx="18" fill="#edf4ff" stroke="#7ca4e5" stroke-width="2" />
+        <text x="370" y="58" text-anchor="middle" font-family="Segoe UI" font-size="16" fill="#183153" font-weight="700">Build compatível?</text>
+        <text x="370" y="82" text-anchor="middle" font-family="Segoe UI" font-size="13" fill="#425166">Windows 10 2004+ ou Windows 11</text>
+
+        <rect x="540" y="30" width="220" height="70" rx="18" fill="#edf4ff" stroke="#7ca4e5" stroke-width="2" />
+        <text x="650" y="58" text-anchor="middle" font-family="Segoe UI" font-size="16" fill="#183153" font-weight="700">Virtualização ativa?</text>
+        <text x="650" y="82" text-anchor="middle" font-family="Segoe UI" font-size="13" fill="#425166">BIOS/UEFI ou Gerenciador</text>
+
+        <rect x="540" y="190" width="220" height="90" rx="18" fill="#fff9ed" stroke="#d6a743" stroke-width="2" />
+        <text x="650" y="220" text-anchor="middle" font-family="Segoe UI" font-size="16" fill="#7a5400" font-weight="700">Corrigir pré-requisito</text>
+        <text x="650" y="244" text-anchor="middle" font-family="Segoe UI" font-size="13" fill="#7a5400">Atualizar Windows ou ativar</text>
+        <text x="650" y="264" text-anchor="middle" font-family="Segoe UI" font-size="13" fill="#7a5400">virtualização e reiniciar</text>
+
+        <rect x="260" y="190" width="220" height="90" rx="18" fill="#f2fbf5" stroke="#57a773" stroke-width="2" />
+        <text x="370" y="220" text-anchor="middle" font-family="Segoe UI" font-size="16" fill="#1d5f35" font-weight="700">Instalar WSL</text>
+        <text x="370" y="244" text-anchor="middle" font-family="Segoe UI" font-size="13" fill="#1d5f35">Executar comandos e</text>
+        <text x="370" y="264" text-anchor="middle" font-family="Segoe UI" font-size="13" fill="#1d5f35">seguir com Ubuntu</text>
+
+        <line x1="200" y1="65" x2="260" y2="65" stroke="#285ea8" stroke-width="3" marker-end="url(#arrow-a)" />
+        <line x1="480" y1="65" x2="540" y2="65" stroke="#285ea8" stroke-width="3" marker-end="url(#arrow-a)" />
+        <line x1="650" y1="100" x2="650" y2="190" stroke="#285ea8" stroke-width="3" marker-end="url(#arrow-a)" />
+        <line x1="540" y1="235" x2="480" y2="235" stroke="#285ea8" stroke-width="3" marker-end="url(#arrow-a)" />
+        <text x="665" y="148" font-family="Segoe UI" font-size="13" fill="#183153" font-weight="700">Não</text>
+        <text x="498" y="227" font-family="Segoe UI" font-size="13" fill="#183153" font-weight="700">Após correção</text>
+        <text x="602" y="55" font-family="Segoe UI" font-size="13" fill="#183153" font-weight="700">Sim</text>
+      </svg>
+    </div>
+  </section>
+
+  <section class="page page-break">
+    <h2 id="cap-2">2. Configurações detalhadas no Windows</h2>
+    <p class="section-intro">Esta etapa cobre tudo o que precisa ser ajustado no sistema operacional antes ou durante a instalação do WSL.</p>
+
+    <h3>2.1 Atualizar o Windows</h3>
+    <ol class="steps">
+      <li>Acesse <strong>Configurações &gt; Windows Update</strong>.</li>
+      <li>Clique em <strong>Verificar se há atualizações</strong>.</li>
+      <li>Instale todas as atualizações importantes, inclusive as cumulativas.</li>
+      <li>Reinicie o computador se solicitado.</li>
+      <li>Repita a checagem até não haver pendências críticas.</li>
+    </ol>
+
+    <h3>2.2 Ativar virtualização na BIOS/UEFI</h3>
+    <ol class="steps">
+      <li>Reinicie o computador e entre no setup da BIOS/UEFI usando a tecla indicada pelo fabricante, como <code class="inline">F2</code>, <code class="inline">Del</code> ou <code class="inline">Esc</code>.</li>
+      <li>Procure opções com nomes como <strong>Intel Virtualization Technology (VT-x)</strong>, <strong>Intel VT-d</strong>, <strong>SVM Mode</strong> ou <strong>AMD-V</strong>.</li>
+      <li>Ative a opção correspondente.</li>
+      <li>Salve as alterações e saia.</li>
+      <li>Ao voltar ao Windows, confirme a ativação pelo Gerenciador de Tarefas.</li>
+    </ol>
+
+    <div class="callout warning">
+      <strong>Possível erro:</strong> se a opção de virtualização não aparecer, o firmware pode estar desatualizado, bloqueado por política corporativa ou o processador pode não oferecer suporte adequado. Nesses casos, consulte o fabricante da máquina.
+    </div>
+
+    <h3>2.3 Ativar recursos opcionais do Windows manualmente</h3>
+    <p>Mesmo usando <code class="inline">wsl --install</code>, é útil conhecer a ativação manual caso a instalação simplificada falhe.</p>
+
+    <div class="command">
+      <span class="label">PowerShell (Administrador)</span>
+      <pre>dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart</pre>
+    </div>
+
+    <ol class="steps">
+      <li>Execute os comandos acima em um PowerShell com privilégios administrativos.</li>
+      <li>Reinicie o computador quando a ativação terminar.</li>
+      <li>Depois do reinício, volte ao PowerShell e prossiga com a instalação do WSL.</li>
+    </ol>
+
+    <h3>2.4 Método gráfico alternativo</h3>
+    <ol class="steps">
+      <li>Abra o menu Iniciar e pesquise por <strong>Ativar ou desativar recursos do Windows</strong>.</li>
+      <li>Marque <strong>Subsistema do Windows para Linux</strong>.</li>
+      <li>Marque <strong>Plataforma de Máquina Virtual</strong>.</li>
+      <li>Confirme, aguarde a instalação e reinicie o sistema.</li>
+    </ol>
+  </section>
+
+  <section class="page page-break">
+    <h2 id="cap-3">3. Instalação do WSL e do Ubuntu</h2>
+    <p class="section-intro">Agora o ambiente Linux será efetivamente instalado.</p>
+
+    <h3>3.1 Instalação simplificada</h3>
+    <div class="command">
+      <span class="label">PowerShell (Administrador)</span>
+      <pre>wsl --install
+wsl --set-default-version 2</pre>
+    </div>
+
+    <ol class="steps">
+      <li>Execute <code class="inline">wsl --install</code>. O Windows instalará os componentes necessários e, em muitos casos, o Ubuntu padrão.</li>
+      <li>Se solicitado, reinicie o computador.</li>
+      <li>Depois do reboot, a instalação do Ubuntu pode continuar automaticamente.</li>
+      <li>Quando a janela do Ubuntu abrir, crie seu usuário Linux e uma senha forte.</li>
+      <li>Guarde essa senha: ela será usada com <code class="inline">sudo</code> para instalar pacotes e alterar configurações.</li>
+    </ol>
+
+    <h3>3.2 Instalação explícita do Ubuntu</h3>
+    <p>Se o Ubuntu não vier automaticamente ou se você quiser escolher a distribuição manualmente:</p>
+
+    <div class="command">
+      <span class="label">PowerShell (Administrador)</span>
+      <pre>wsl --list --online
+wsl --install -d Ubuntu</pre>
+    </div>
+
+    <h3>3.3 Confirmar status do WSL</h3>
+    <div class="command">
+      <span class="label">PowerShell ou CMD</span>
+      <pre>wsl --status
+wsl --list --verbose</pre>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Validação</th>
+          <th>Resultado esperado</th>
+          <th>Ação se estiver diferente</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code class="inline">wsl --status</code></td>
+          <td>WSL instalado e versão padrão 2</td>
+          <td>Execute <code class="inline">wsl --set-default-version 2</code> e revise os recursos do Windows.</td>
+        </tr>
+        <tr>
+          <td><code class="inline">wsl --list --verbose</code></td>
+          <td>Ubuntu em estado Running ou Stopped e versão 2</td>
+          <td>Se estiver em versão 1, use <code class="inline">wsl --set-version Ubuntu 2</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>3.4 Primeiro acesso ao Ubuntu</h3>
+    <div class="command">
+      <span class="label">Bash (Ubuntu no WSL)</span>
+      <pre>uname -a
+lsb_release -a
+whoami
+pwd</pre>
+    </div>
+
+    <div class="callout info">
+      <strong>Boa prática:</strong> os arquivos do projeto Linux devem ficar preferencialmente dentro do sistema de arquivos do WSL, por exemplo em <code class="inline">/home/seu_usuario/projetos</code>. Isso melhora desempenho e reduz problemas de permissões.
+    </div>
+  </section>
+
+  <section class="page page-break">
+    <h2 id="cap-4">4. Atualização do Ubuntu e instalação do Google Chrome</h2>
+    <p class="section-intro">Com o Ubuntu inicializado, atualize o sistema e instale o navegador.</p>
+
+    <h3>4.1 Atualizar pacotes básicos</h3>
+    <div class="command">
+      <span class="label">Bash (Ubuntu)</span>
+      <pre>sudo apt update
+sudo apt upgrade -y
+sudo apt install -y wget curl ca-certificates gnupg software-properties-common</pre>
+    </div>
+
+    <ol class="steps">
+      <li>Abra o Ubuntu pelo menu Iniciar ou com <code class="inline">wsl</code>.</li>
+      <li>Execute os comandos acima para atualizar os repositórios e os pacotes instalados.</li>
+      <li>Instale utilitários necessários para o download e validação do pacote do Chrome.</li>
+    </ol>
+
+    <h3>4.2 Instalar o Google Chrome no Ubuntu</h3>
+    <div class="command">
+      <span class="label">Bash (Ubuntu)</span>
+      <pre>wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo apt install -y ./google-chrome-stable_current_amd64.deb</pre>
+    </div>
+
+    <p>Se o APT indicar dependências pendentes, execute:</p>
+    <div class="command">
+      <span class="label">Bash (Ubuntu)</span>
+      <pre>sudo apt --fix-broken install -y</pre>
+    </div>
+
+    <h3>4.3 Executar o Chrome no WSL</h3>
+    <div class="command">
+      <span class="label">Bash (Ubuntu)</span>
+      <pre>google-chrome
+# ou, em alguns ambientes:
+google-chrome-stable</pre>
+    </div>
+
+    <div class="callout success">
+      <strong>WSLg:</strong> em Windows 11 e instalações atualizadas do WSL, aplicações gráficas Linux funcionam com WSLg. Isso permite abrir o Chrome do Ubuntu com interface gráfica sem instalar servidor X externo na maioria dos casos.
+    </div>
+
+    <div class="callout warning">
+      <strong>Atenção:</strong> em máquinas corporativas ou ambientes sem WSLg, o Chrome pode não abrir por falta de suporte gráfico. Nessa situação, atualize o WSL, reinicie o serviço e valide se a sessão Linux possui integração gráfica habilitada.
+    </div>
+
+    <div class="flowchart">
+      <svg viewBox="0 0 860 360" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Fluxograma da instalação do Ubuntu e Chrome">
+        <defs>
+          <marker id="arrow-b" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+            <path d="M0,0 L10,3 L0,6 Z" fill="#285ea8"></path>
+          </marker>
+        </defs>
+        <rect x="35" y="25" width="200" height="70" rx="18" fill="#0b57d0" />
+        <text x="135" y="55" text-anchor="middle" font-family="Segoe UI" font-size="18" fill="#fff" font-weight="700">Ubuntu aberto</text>
+        <text x="135" y="80" text-anchor="middle" font-family="Segoe UI" font-size="13" fill="#e8f0ff">Atualizar APT</text>
+
+        <rect x="325" y="25" width="200" height="70" rx="18" fill="#edf4ff" stroke="#7ca4e5" stroke-width="2" />
+        <text x="425" y="55" text-anchor="middle" font-family="Segoe UI" font-size="17" fill="#183153" font-weight="700">Baixar pacote .deb</text>
+        <text x="425" y="80" text-anchor="middle" font-family="Segoe UI" font-size="13" fill="#425166">Chrome estável</text>
+
+        <rect x="615" y="25" width="200" height="70" rx="18" fill="#edf4ff" stroke="#7ca4e5" stroke-width="2" />
+        <text x="715" y="55" text-anchor="middle" font-family="Segoe UI" font-size="17" fill="#183153" font-weight="700">Instalar via APT</text>
+        <text x="715" y="80" text-anchor="middle" font-family="Segoe UI" font-size="13" fill="#425166">Resolver dependências</text>
+
+        <rect x="325" y="190" width="200" height="90" rx="18" fill="#f2fbf5" stroke="#57a773" stroke-width="2" />
+        <text x="425" y="220" text-anchor="middle" font-family="Segoe UI" font-size="16" fill="#1d5f35" font-weight="700">Abrir Chrome</text>
+        <text x="425" y="244" text-anchor="middle" font-family="Segoe UI" font-size="13" fill="#1d5f35">WSLg ativo e interface</text>
+        <text x="425" y="264" text-anchor="middle" font-family="Segoe UI" font-size="13" fill="#1d5f35">gráfica funcionando</text>
+
+        <rect x="615" y="190" width="200" height="90" rx="18" fill="#fff5f5" stroke="#cc6b6b" stroke-width="2" />
+        <text x="715" y="220" text-anchor="middle" font-family="Segoe UI" font-size="16" fill="#8f2d2d" font-weight="700">Falha gráfica?</text>
+        <text x="715" y="244" text-anchor="middle" font-family="Segoe UI" font-size="13" fill="#8f2d2d">Atualizar WSL, validar</text>
+        <text x="715" y="264" text-anchor="middle" font-family="Segoe UI" font-size="13" fill="#8f2d2d">WSLg e reiniciar</text>
+
+        <line x1="235" y1="60" x2="325" y2="60" stroke="#285ea8" stroke-width="3" marker-end="url(#arrow-b)" />
+        <line x1="525" y1="60" x2="615" y2="60" stroke="#285ea8" stroke-width="3" marker-end="url(#arrow-b)" />
+        <line x1="715" y1="95" x2="715" y2="190" stroke="#285ea8" stroke-width="3" marker-end="url(#arrow-b)" />
+        <line x1="615" y1="235" x2="525" y2="235" stroke="#285ea8" stroke-width="3" marker-end="url(#arrow-b)" />
+        <text x="722" y="145" font-family="Segoe UI" font-size="13" fill="#183153" font-weight="700">Se falhar</text>
+        <text x="566" y="227" font-family="Segoe UI" font-size="13" fill="#183153" font-weight="700">Após ajuste</text>
+      </svg>
+    </div>
+  </section>
+
+  <section class="page page-break">
+    <h2 id="cap-5">5. Troubleshooting durante a instalação</h2>
+    <p class="section-intro">A tabela abaixo reúne falhas comuns e as ações corretivas mais úteis.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Erro ou sintoma</th>
+          <th>Causa provável</th>
+          <th>Solução detalhada</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>“WslRegisterDistribution failed with error: 0x80370102”</strong></td>
+          <td>Virtualização desabilitada ou recurso de plataforma virtual não ativo.</td>
+          <td>Ative Intel VT-x/AMD-V na BIOS, confirme <strong>Plataforma de Máquina Virtual</strong> no Windows e reinicie. Depois execute <code class="inline">wsl --status</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>“The requested operation requires elevation”</strong></td>
+          <td>Comando executado sem privilégios administrativos.</td>
+          <td>Feche a janela atual, abra PowerShell como administrador e rode novamente o comando de instalação.</td>
+        </tr>
+        <tr>
+          <td><strong>Ubuntu abre e fecha imediatamente</strong></td>
+          <td>Instalação incompleta, atualização pendente ou corrupção da distro.</td>
+          <td>Rode <code class="inline">wsl --shutdown</code>, atualize o WSL com <code class="inline">wsl --update</code> e tente abrir a distro novamente. Se persistir, exporte dados importantes e reinstale a distro.</td>
+        </tr>
+        <tr>
+          <td><strong>Chrome não abre no Ubuntu</strong></td>
+          <td>WSLg desatualizado, dependências quebradas ou ausência de suporte gráfico.</td>
+          <td>Atualize com <code class="inline">wsl --update</code>, execute <code class="inline">sudo apt --fix-broken install -y</code> e reinicie a sessão com <code class="inline">wsl --shutdown</code>. Depois abra o Ubuntu e teste novamente.</td>
+        </tr>
+        <tr>
+          <td><strong>Erro de download do pacote .deb</strong></td>
+          <td>Rede corporativa, proxy, DNS ou bloqueio de URL.</td>
+          <td>Teste a conectividade com <code class="inline">curl -I https://dl.google.com</code>, configure proxy se necessário e tente outra rede. Em ambiente corporativo, consulte a TI.</td>
+        </tr>
+        <tr>
+          <td><strong>Sem espaço em disco</strong></td>
+          <td>Armazenamento insuficiente no Windows ou na VHD do WSL.</td>
+          <td>Libere espaço, remova distros não usadas e reinicie. Para casos avançados, considere mover a distro ou revisar políticas de armazenamento.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>5.1 Comandos úteis para correção</h3>
+    <div class="grid-2">
+      <div class="command">
+        <span class="label">PowerShell</span>
+        <pre>wsl --update
+wsl --shutdown
+wsl --status
+wsl --list --verbose</pre>
+      </div>
+      <div class="command">
+        <span class="label">Bash (Ubuntu)</span>
+        <pre>sudo apt update
+sudo apt --fix-broken install -y
+sudo dpkg --configure -a</pre>
+      </div>
+    </div>
+
+    <div class="callout danger">
+      <strong>Cuidado:</strong> só use <code class="inline">wsl --unregister Ubuntu</code> se você tiver certeza de que não precisa dos dados da distribuição. Esse comando remove a distro e seus arquivos locais.
+    </div>
+  </section>
+
+  <section class="page page-break">
+    <h2 id="cap-6">6. Boas práticas para Engenharia de IA no WSL</h2>
+    <p class="section-intro">Após instalar o ambiente, vale estruturá-lo corretamente para produtividade, reprodutibilidade e desempenho.</p>
+
+    <h3>6.1 Pacotes-base recomendados</h3>
+    <div class="command">
+      <span class="label">Bash (Ubuntu)</span>
+      <pre>sudo apt install -y python3 python3-pip python3-venv git build-essential unzip</pre>
+    </div>
+
+    <h3>6.2 Python e ambientes virtuais</h3>
+    <ol class="steps">
+      <li>Crie uma pasta de projetos dentro do Linux, por exemplo <code class="inline">~/projetos</code>.</li>
+      <li>Para cada projeto, crie um ambiente virtual dedicado.</li>
+      <li>Mantenha dependências em <code class="inline">requirements.txt</code> ou em um gerenciador equivalente.</li>
+      <li>Evite instalar bibliotecas globais no sistema quando o objetivo for desenvolvimento repetível.</li>
+    </ol>
+
+    <div class="command">
+      <span class="label">Bash (Ubuntu)</span>
+      <pre>mkdir -p ~/projetos/exemplo-ia
+cd ~/projetos/exemplo-ia
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip</pre>
+    </div>
+
+    <h3>6.3 VS Code e integração com WSL</h3>
+    <ul class="compact">
+      <li>Instale o VS Code no Windows.</li>
+      <li>Adicione a extensão <strong>WSL</strong>.</li>
+      <li>Abra o terminal Ubuntu e execute <code class="inline">code .</code> dentro da pasta do projeto.</li>
+      <li>Prefira editar projetos Linux a partir do lado Linux para melhor desempenho.</li>
+    </ul>
+
+    <h3>6.4 Git e organização do trabalho</h3>
+    <div class="command">
+      <span class="label">Bash (Ubuntu)</span>
+      <pre>git config --global user.name "Seu Nome"
+git config --global user.email "seu-email@exemplo.com"</pre>
+    </div>
+
+    <h3>6.5 Ajustes de desempenho com .wslconfig</h3>
+    <p>Se você usa modelos, notebooks e bibliotecas mais pesadas, limitar recursos do WSL ajuda a manter equilíbrio com o Windows.</p>
+
+    <div class="command">
+      <span class="label">Arquivo no Windows: %UserProfile%\.wslconfig</span>
+      <pre>[wsl2]
+memory=8GB
+processors=4
+swap=4GB
+localhostForwarding=true</pre>
+    </div>
+
+    <ol class="steps">
+      <li>Crie o arquivo <code class="inline">.wslconfig</code> no diretório do seu usuário Windows, por exemplo <code class="inline">C:\Users\SeuUsuario\.wslconfig</code>.</li>
+      <li>Salve os parâmetros de memória, CPU e swap conforme a capacidade da máquina.</li>
+      <li>Aplique as mudanças com <code class="inline">wsl --shutdown</code> e reabra o Ubuntu.</li>
+    </ol>
+
+    <h3>6.6 Chrome, WSLg e produtividade</h3>
+    <ul class="compact">
+      <li>Use o Chrome do Ubuntu quando quiser testar aplicações Linux com ambiente gráfico nativo do WSL.</li>
+      <li>Para uso cotidiano simples, o navegador Windows pode continuar sendo suficiente.</li>
+      <li>Evite múltiplas abas pesadas no WSL em máquinas com pouca RAM.</li>
+      <li>Se for usar automação com navegador, mantenha versões do Chrome e bibliotecas compatíveis.</li>
+    </ul>
+  </section>
+
+  <section class="page page-break">
+    <h2 id="cap-7">7. Checklist de validação final</h2>
+    <p class="section-intro">Use a lista abaixo para garantir que a instalação terminou corretamente.</p>
+
+    <ul class="checklist">
+      <li><span class="checkbox"></span><span>O Windows está atualizado e reiniciado após as alterações necessárias.</span></li>
+      <li><span class="checkbox"></span><span>A virtualização está ativa no firmware e confirmada no Windows.</span></li>
+      <li><span class="checkbox"></span><span>Os recursos <strong>Subsistema do Windows para Linux</strong> e <strong>Plataforma de Máquina Virtual</strong> estão ativos.</span></li>
+      <li><span class="checkbox"></span><span>O comando <code class="inline">wsl --status</code> executa sem erro.</span></li>
+      <li><span class="checkbox"></span><span>O Ubuntu foi iniciado e o usuário Linux foi criado com sucesso.</span></li>
+      <li><span class="checkbox"></span><span>O comando <code class="inline">wsl --list --verbose</code> mostra a distro Ubuntu na versão 2.</span></li>
+      <li><span class="checkbox"></span><span>Os comandos <code class="inline">sudo apt update</code> e <code class="inline">sudo apt upgrade -y</code> terminaram sem erro crítico.</span></li>
+      <li><span class="checkbox"></span><span>O Google Chrome foi instalado no Ubuntu e abre com interface gráfica.</span></li>
+      <li><span class="checkbox"></span><span>Python, pip, venv e Git estão disponíveis no Ubuntu.</span></li>
+      <li><span class="checkbox"></span><span>Projetos de IA serão salvos dentro do sistema de arquivos Linux para melhor desempenho.</span></li>
+      <li><span class="checkbox"></span><span>Se necessário, o arquivo <code class="inline">.wslconfig</code> foi criado e aplicado com recursos ajustados.</span></li>
+    </ul>
+
+    <div class="callout success">
+      <strong>Conclusão esperada:</strong> ao final deste checklist, você terá um ambiente Windows + Ubuntu via WSL pronto para navegação gráfica, desenvolvimento Python, uso de Git e evolução para fluxos de Engenharia de IA mais completos.
+    </div>
+  </section>
+
+  <section class="page page-break">
+    <h2 id="cap-8">8. Apêndice: erros comuns do WSL</h2>
+    <p class="section-intro">Referência rápida para problemas recorrentes após a instalação.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Mensagem / situação</th>
+          <th>Interpretação</th>
+          <th>Resposta recomendada</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>0x800701bc</strong></td>
+          <td>Kernel do WSL ausente ou desatualizado.</td>
+          <td>Execute <code class="inline">wsl --update</code> e reinicie a sessão com <code class="inline">wsl --shutdown</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>0x80070003</strong></td>
+          <td>Caminho, pacote ou registro da distribuição inconsistente.</td>
+          <td>Atualize o WSL, revise a instalação da distro e valide se não houve remoção manual de arquivos.</td>
+        </tr>
+        <tr>
+          <td><strong>0xffffffff</strong></td>
+          <td>Falha genérica do subsistema, muitas vezes ligada a serviço parado ou corrupção.</td>
+          <td>Reinicie com <code class="inline">wsl --shutdown</code>, reinicie o Windows e teste novamente. Se persistir, investigue eventos e reinstale a distro.</td>
+        </tr>
+        <tr>
+          <td><strong>Erro de DNS no Ubuntu</strong></td>
+          <td>Integração de rede do WSL ou políticas corporativas interferindo.</td>
+          <td>Teste conectividade, revise VPN/proxy e, se necessário, ajuste DNS com suporte da TI.</td>
+        </tr>
+        <tr>
+          <td><strong>Lentidão excessiva no acesso a arquivos</strong></td>
+          <td>Projeto sendo executado em unidade Windows montada em vez de diretório Linux.</td>
+          <td>Mova o projeto para <code class="inline">/home/usuario</code> ou outra pasta interna do WSL.</td>
+        </tr>
+        <tr>
+          <td><strong>Permissões estranhas em arquivos Git</strong></td>
+          <td>Mistura de edição entre ferramentas Windows e Linux no mesmo diretório montado.</td>
+          <td>Padronize a edição pelo lado Linux com VS Code Remote WSL e revise permissões do projeto.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>8.1 Comandos de referência rápida</h3>
+    <div class="grid-3">
+      <div class="command">
+        <span class="label">PowerShell</span>
+        <pre>wsl --help
+wsl --version</pre>
+      </div>
+      <div class="command">
+        <span class="label">PowerShell</span>
+        <pre>wsl --shutdown
+wsl --update</pre>
+      </div>
+      <div class="command">
+        <span class="label">Bash</span>
+        <pre>df -h
+free -h
+ip a</pre>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <strong>Dica final:</strong> depois de confirmar que tudo está funcionando, vale criar um pequeno projeto Python de teste e abrir com VS Code Remote WSL. Isso valida, em um único fluxo, shell, Python, Git, edição e integração com o sistema.
+    </div>
+  </section>
+
+  <script>
+    (function () {
+      const dateEl = document.getElementById('issue-date');
+      if (dateEl) {
+        const now = new Date();
+        const formatted = now.toLocaleDateString('pt-BR');
+        dateEl.textContent = formatted;
+      }
+
+      const toc = document.getElementById('toc');
+      const headings = document.querySelectorAll('h2[id], h3[id]');
+      headings.forEach((heading) => {
+        const li = document.createElement('li');
+        if (heading.tagName.toLowerCase() === 'h3') {
+          li.className = 'toc-level-3';
+        }
+        const a = document.createElement('a');
+        a.href = `#${heading.id}`;
+        a.textContent = heading.textContent;
+        const pageHint = document.createElement('span');
+        pageHint.textContent = 'ver seção';
+        li.appendChild(a);
+        li.appendChild(pageHint);
+        toc.appendChild(li);
+      });
+    }());
+  </script>
+</body>
+</html>
