@@ -1011,8 +1011,21 @@ ip a</pre>
       }
 
       const toc = document.getElementById('toc');
-      const headings = document.querySelectorAll('h2[id], h3[id]');
+      const slugify = (text) => text
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+
+      const headings = document.querySelectorAll('h2, h3');
       headings.forEach((heading) => {
+        if (!heading.id) {
+          heading.id = slugify(heading.textContent);
+        }
+        if (heading.textContent.trim() === 'Índice') {
+          return;
+        }
         const li = document.createElement('li');
         if (heading.tagName.toLowerCase() === 'h3') {
           li.className = 'toc-level-3';
